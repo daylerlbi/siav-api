@@ -1,0 +1,60 @@
+# Ignorar archivos innecesarios para el build de Docker
+.git
+.gitignore
+docker-compose.yml
+Dockerfile
+LICENSE
+README.md
+*.md
+
+# Archivos de entorno
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# Archivos de build y dependencias
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+bin/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDEs
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### Eclipse ###
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Test reports
+HELP.md
+
+# Archivos temporales
+*.tmp
+*.temp

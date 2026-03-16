@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.context.annotation.Profile;
 import javax.sql.DataSource;
 import java.util.Map;
-@Profile("prod")
+
 @Configuration
 @EnableTransactionManagement
 @RequiredArgsConstructor

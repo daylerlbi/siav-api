@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.context.annotation.Profile;
 import java.util.List;
 
-
+@Profile("prod")
 @RestController
 @RequestMapping("/api/oracle/materias-matriculadas")
 @Tag(name = "Gestión de Materias Matriculadas Oracle", description = "API para la consulta de información de materias matriculadas desde la base de datos Oracle de UFPS. "

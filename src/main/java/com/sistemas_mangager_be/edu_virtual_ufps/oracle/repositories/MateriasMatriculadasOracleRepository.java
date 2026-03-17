@@ -6,9 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-
 public interface MateriasMatriculadasOracleRepository
         extends JpaRepository<MateriasMatriculadasOracle, MateriasMatriculadasId> {
+    List<MateriasMatriculadasOracle> findByCodCarMat(String codCarMat);
+    List<MateriasMatriculadasOracle> findByCodAlumno(String codAlumno);
+    List<MateriasMatriculadasOracle> findByCodAlumnoAndCodMateria(String codAlumno, String codMateria);
+    List<MateriasMatriculadasOracle> findByCodCarMatAndCodMatMatAndGrupo(String codCarMat, String codMatMat, String grupo);
+    List<MateriasMatriculadasOracle> findByCodCarreraAndCodAlumno(String codCarrera, String codAlumno);
 }
-
-

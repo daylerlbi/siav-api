@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-
 public interface EstudianteOracleRepository extends JpaRepository<EstudianteOracle, String> {
-
+    List<EstudianteOracle> findByNomCarrera(String nomCarrera);
+    List<EstudianteOracle> findByCodigo(String codigo);
+    List<EstudianteOracle> findByCodigoStartingWith(String codigo);
 }

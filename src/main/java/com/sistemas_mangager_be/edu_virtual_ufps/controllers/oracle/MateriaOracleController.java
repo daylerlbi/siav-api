@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.List;
 import java.util.Optional;
 
-@Profile("prod")
+
 @RestController
 @RequestMapping("/api/oracle/materias")
 @Tag(name = "Gestión de Materias Oracle", description = "API para la consulta de información de materias académicas desde la base de datos Oracle de UFPS. "

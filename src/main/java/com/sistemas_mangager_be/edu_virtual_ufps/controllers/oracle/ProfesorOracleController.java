@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Profile;
 import java.util.List;
 
-@Profile("prod")
+
 @RestController
 @RequestMapping("/api/oracle/profesores")
 @Tag(name = "Gestión de Profesores Oracle", description = "API para la consulta de información de profesores desde la base de datos Oracle de UFPS. "

@@ -23,6 +23,8 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Integer>
 
     Optional<Estudiante> findByCodigo(String codigo);
 
+    Optional<Estudiante> findByEmail(String email);
+
     boolean existsByEmail(String email);
 
     boolean existsByCodigo(String codigo);
@@ -30,5 +32,6 @@ public interface EstudianteRepository extends JpaRepository<Estudiante, Integer>
     boolean existsByMoodleId(String moodleId);
 
     boolean existsByCedula(String cedula);
+
 
 }

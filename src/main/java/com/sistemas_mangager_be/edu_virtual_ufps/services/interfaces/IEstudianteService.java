@@ -21,6 +21,8 @@ public interface IEstudianteService {
 
     EstudianteResponse listarEstudiante(Integer id) throws EstudianteNotFoundException;
 
+    EstudianteResponse listarEstudiantePorEmail(String email) throws EstudianteNotFoundException;
+    
     List<EstudianteResponse> listarEstudiantes();
 
     List<EstudianteResponse> listarEstudiantesPorPensum(Integer pensumId) throws PensumNotFoundException;

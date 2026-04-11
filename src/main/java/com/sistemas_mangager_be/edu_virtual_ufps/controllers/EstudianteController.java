@@ -338,4 +338,19 @@ public class EstudianteController {
                 .listarEstudiantesPorGrupoCohorteConMatriculaEnCurso(grupoCohorteId);
         return new ResponseEntity<>(estudianteResponse, HttpStatus.OK);
     }
+
+
+@GetMapping("/email/{email:.+}")
+public ResponseEntity<EstudianteResponse> listarEstudiantePorEmail(
+        @PathVariable String email) throws EstudianteNotFoundException {
+    EstudianteResponse estudianteResponse = estudianteService.listarEstudiantePorEmail(email);
+    return new ResponseEntity<>(estudianteResponse, HttpStatus.OK);
 }
+}
+
+
+
+
+
+
+

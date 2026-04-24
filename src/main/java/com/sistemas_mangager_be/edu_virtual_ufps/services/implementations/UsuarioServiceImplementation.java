@@ -35,30 +35,25 @@ public class UsuarioServiceImplementation implements IUsuarioService {
     public static final String IS_NOT_CORRECT = "%s no es correcta";
 
     private final RolRepository rolRepository;
-
     private final UsuarioRepository usuarioRepository;
 
     @Override
     public UsuarioDTO crearProfesor(DocenteRequest docenteRequest) throws RoleNotFoundException, UserExistException {
-        // Validar email único
         if (usuarioRepository.existsByEmail(docenteRequest.getEmail())) {
             throw new UserExistException(
                     String.format(IS_ALREADY_USE, "El correo electrónico " + docenteRequest.getEmail()));
         }
 
-        // Validar código único (si no es nulo)
         if (docenteRequest.getCodigo() != null && !docenteRequest.getCodigo().isEmpty() &&
                 usuarioRepository.existsByCodigo(docenteRequest.getCodigo())) {
             throw new UserExistException(String.format(IS_ALREADY_USE, "El código " + docenteRequest.getCodigo()));
         }
 
-        // Validar cédula única (si no es nula)
         if (docenteRequest.getCedula() != null && !docenteRequest.getCedula().isEmpty() &&
                 usuarioRepository.existsByCedula(docenteRequest.getCedula())) {
             throw new UserExistException(String.format(IS_ALREADY_USE, "La cédula " + docenteRequest.getCedula()));
         }
 
-        // Validar googleId único (si no es nulo)
         if (docenteRequest.getGoogleId() != null && !docenteRequest.getGoogleId().isEmpty() &&
                 usuarioRepository.existsByGoogleId(docenteRequest.getGoogleId())) {
             throw new UserExistException(
@@ -71,13 +66,11 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                 docenteRequest.getPrimerApellido() + " " + docenteRequest.getSegundoApellido());
         BeanUtils.copyProperties(docenteRequest, docente);
 
-        // Asignar rol docente (2 es el ID del rol docente)
         Rol rolDocente = rolRepository.findById(2)
                 .orElseThrow(
                         () -> new RoleNotFoundException(String.format(IS_NOT_FOUND, "EL ROL DOCENTE").toLowerCase()));
         docente.setRolId(rolDocente);
 
-        // Guardar el nuevo docente
         usuarioRepository.save(docente);
 
         return convertirAUsuarioDTO(docente);
@@ -96,13 +89,11 @@ public class UsuarioServiceImplementation implements IUsuarioService {
             throw new UserExistException(String.format(IS_ALREADY_USE, "El ID de Moodle " + moodleRequest.getMoodleId()));
         }
 
-        // Actualizar el Moodle ID del usuario
         usuario.setMoodleId(moodleRequest.getMoodleId());
         usuarioRepository.save(usuario);
     }
 
     public void registraroActualizarUsuarioGoogle(LoginGoogleRequest loginGoogleRequest) throws UserExistException {
-        // Validar googleId único si el usuario no existe por email
         if (!usuarioRepository.existsByEmail(loginGoogleRequest.getEmail()) &&
                 loginGoogleRequest.getGoogleId() != null &&
                 !loginGoogleRequest.getGoogleId().isEmpty() &&
@@ -112,7 +103,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
 
         usuarioRepository.findByEmail(loginGoogleRequest.getEmail()).ifPresentOrElse(
                 usuario -> {
-                    // Actualización de usuario existente
                     if (loginGoogleRequest.getGoogleId() != null && !loginGoogleRequest.getGoogleId().isEmpty() &&
                             !loginGoogleRequest.getGoogleId().equals(usuario.getGoogleId()) &&
                             usuarioRepository.existsByGoogleId(loginGoogleRequest.getGoogleId())) {
@@ -125,9 +115,8 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     usuario.setFotoUrl(loginGoogleRequest.getFotoUrl() == null ? usuario.getFotoUrl()
                             : loginGoogleRequest.getFotoUrl());
 
-                    // Si es un estudiante (rol por defecto) pero ya estaba registrado como docente,
-                    // mantener rol
-                    if (usuario.getRolId() == null || usuario.getRolId().getId() == 1) {
+                    // ✅ CORRECCIÓN: Solo asigna Estudiante si no tiene ningún rol asignado
+                    if (usuario.getRolId() == null) {
                         Rol rolEstudiante = rolRepository.findById(1).orElseThrow();
                         usuario.setRolId(rolEstudiante);
                     }
@@ -135,7 +124,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     usuarioRepository.save(usuario);
                 },
                 () -> {
-                    // Creación de nuevo usuario (estudiante por defecto)
                     Usuario nuevoUsuario = new Usuario();
                     nuevoUsuario.setEmail(loginGoogleRequest.getEmail());
                     nuevoUsuario.setGoogleId(loginGoogleRequest.getGoogleId());
@@ -159,14 +147,12 @@ public class UsuarioServiceImplementation implements IUsuarioService {
 
         usuarioRepository.findByEmail(email).ifPresentOrElse(
                 usuario -> {
-                    // Actualización de usuario existente
                     usuario.setGoogleId(googleId);
                     usuario.setNombreCompleto(nombre.isEmpty() ? usuario.getNombreCompleto() : nombre);
                     usuario.setFotoUrl(fotoUrl == null ? usuario.getFotoUrl() : fotoUrl);
 
-                    // Si es un estudiante (rol por defecto) pero ya estaba registrado como docente,
-                    // mantener rol
-                    if (usuario.getRolId() == null || usuario.getRolId().getId() == 1) {
+                    // ✅ CORRECCIÓN: Solo asigna Estudiante si no tiene ningún rol asignado
+                    if (usuario.getRolId() == null) {
                         Rol rolEstudiante = rolRepository.findById(1).orElseThrow();
                         usuario.setRolId(rolEstudiante);
                     }
@@ -174,7 +160,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     usuarioRepository.save(usuario);
                 },
                 () -> {
-                    // Creación de nuevo usuario (estudiante por defecto)
                     Usuario nuevoUsuario = new Usuario();
                     nuevoUsuario.setEmail(email);
                     nuevoUsuario.setGoogleId(googleId);
@@ -199,28 +184,24 @@ public class UsuarioServiceImplementation implements IUsuarioService {
             throw new UserNotFoundException("El usuario no tiene rol de profesor");
         }
 
-        // Validar email único (si cambió)
         if (!profesor.getEmail().equals(docenteRequest.getEmail()) &&
                 usuarioRepository.existsByEmail(docenteRequest.getEmail())) {
             throw new UserExistException(
                     String.format(IS_ALREADY_USE, "El correo electrónico " + docenteRequest.getEmail()));
         }
 
-        // Validar código único (si cambió y no es nulo)
         if (docenteRequest.getCodigo() != null && !docenteRequest.getCodigo().isEmpty() &&
                 !docenteRequest.getCodigo().equals(profesor.getCodigo()) &&
                 usuarioRepository.existsByCodigo(docenteRequest.getCodigo())) {
             throw new UserExistException(String.format(IS_ALREADY_USE, "El código " + docenteRequest.getCodigo()));
         }
 
-        // Validar cédula única (si cambió y no es nula)
         if (docenteRequest.getCedula() != null && !docenteRequest.getCedula().isEmpty() &&
                 !docenteRequest.getCedula().equals(profesor.getCedula()) &&
                 usuarioRepository.existsByCedula(docenteRequest.getCedula())) {
             throw new UserExistException(String.format(IS_ALREADY_USE, "La cédula " + docenteRequest.getCedula()));
         }
 
-        // Validar googleId único (si cambió y no es nulo)
         if (docenteRequest.getGoogleId() != null && !docenteRequest.getGoogleId().isEmpty() &&
                 !docenteRequest.getGoogleId().equals(profesor.getGoogleId()) &&
                 usuarioRepository.existsByGoogleId(docenteRequest.getGoogleId())) {
@@ -287,7 +268,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     return usuarioResponse;
                 }).collect(Collectors.toList());
     }
-
 
     private UsuarioDTO convertirAUsuarioDTO(Usuario usuario) {
         UsuarioDTO dto = new UsuarioDTO();

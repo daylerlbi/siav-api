@@ -33,7 +33,6 @@ public class ProgramaServiceImplementation implements IProgramaService {
     public static final String ARE_NOT_EQUALS = "%s no son iguales";
     public static final String IS_NOT_CORRECT = "%s no es correcta";
 
-
     private final SemestreProgramaRepository semestreProgramaRepository;
     private final ProgramaRepository programaRepository;
     private final TipoProgramaRepository tipoProgramaRepository;
@@ -58,7 +57,6 @@ public class ProgramaServiceImplementation implements IProgramaService {
 
     @Override
     public ProgramaDTO crearPrograma(ProgramaDTO programaDTO) throws ProgramaExistsException {
-        // Validar si ya existe un programa con el mismo código
         if (programaRepository.existsByCodigo(programaDTO.getCodigo())) {
             throw new ProgramaExistsException(
                     String.format(IS_ALREADY_USE,
@@ -82,12 +80,13 @@ public class ProgramaServiceImplementation implements IProgramaService {
         return programaCreado;
     }
 
+    @Override
     public void vincularMoodleId(MoodleRequest moodleRequest)
             throws ProgramaNotFoundException, ProgramaExistsException {
         Programa programa = programaRepository.findById(moodleRequest.getBackendId())
                 .orElseThrow(() -> new ProgramaNotFoundException(
                         String.format(IS_NOT_FOUND,
-                                        "EL PROGRAMA CON EL ID " + moodleRequest.getBackendId())
+                                "EL PROGRAMA CON EL ID " + moodleRequest.getBackendId())
                                 .toLowerCase()));
 
         if (programaRepository.existsByMoodleId(moodleRequest.getMoodleId())) {
@@ -99,12 +98,13 @@ public class ProgramaServiceImplementation implements IProgramaService {
         programaRepository.save(programa);
     }
 
+    @Override
     public void vincularHistoricoMoodleId(MoodleRequest moodleRequest)
             throws ProgramaNotFoundException, ProgramaExistsException {
         Programa programa = programaRepository.findById(moodleRequest.getBackendId())
                 .orElseThrow(() -> new ProgramaNotFoundException(
                         String.format(IS_NOT_FOUND,
-                                        "EL PROGRAMA CON EL ID " + moodleRequest.getBackendId())
+                                "EL PROGRAMA CON EL ID " + moodleRequest.getBackendId())
                                 .toLowerCase()));
 
         if (programaRepository.existsByHistoricoMoodleId(moodleRequest.getMoodleId())) {
@@ -124,7 +124,6 @@ public class ProgramaServiceImplementation implements IProgramaService {
                         String.format(IS_NOT_FOUND, "EL PROGRAMA CON EL ID " + id)
                                 .toLowerCase()));
 
-        // Validar si el código está cambiando y si el nuevo código ya existe
         if (!programa.getCodigo().equals(programaDTO.getCodigo()) &&
                 programaRepository.existsByCodigo(programaDTO.getCodigo())) {
             throw new ProgramaExistsException(
@@ -150,6 +149,17 @@ public class ProgramaServiceImplementation implements IProgramaService {
         }).toList();
     }
 
+    // ✅ NUEVO: listar programas por director
+    @Override
+    public List<ProgramaDTO> listarProgramasPorDirector(Integer directorId) {
+        return programaRepository.findByDirectorId(directorId).stream().map(programa -> {
+            ProgramaDTO programaDTO = new ProgramaDTO();
+            BeanUtils.copyProperties(programa, programaDTO);
+            return programaDTO;
+        }).toList();
+    }
+
+    @Override
     public SemestreProgramaResponse listarSemestresPorPrograma(Integer programaId)
             throws ProgramaNotFoundException {
         Programa programa = programaRepository.findById(programaId)
@@ -161,10 +171,8 @@ public class ProgramaServiceImplementation implements IProgramaService {
     }
 
     private SemestreProgramaResponse mapToSemestreProgramaResponse(Programa programa) {
-        // Obtener todos los semestres asociados al programa
         List<SemestrePrograma> semestresPrograma = semestreProgramaRepository.findByPrograma(programa);
 
-        // Mapear cada SemestrePrograma a un SemestreResponse
         List<SemestreProgramaResponse.SemestreResponse> semestreResponses = semestresPrograma.stream()
                 .map(semestrePrograma -> {
                     new SemestreProgramaResponse.SemestreResponse();
@@ -177,7 +185,6 @@ public class ProgramaServiceImplementation implements IProgramaService {
                 })
                 .toList();
 
-        // Construir y retornar la respuesta completa
         return SemestreProgramaResponse.builder()
                 .id(programa.getId())
                 .nombre(programa.getNombre())
@@ -192,7 +199,7 @@ public class ProgramaServiceImplementation implements IProgramaService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(fechaMatriculacion);
 
-        int mes = cal.get(Calendar.MONTH) + 1; // Enero = 0
+        int mes = cal.get(Calendar.MONTH) + 1;
         int anio = cal.get(Calendar.YEAR);
 
         return anio + "-" + (mes <= 6 ? "I" : "II");

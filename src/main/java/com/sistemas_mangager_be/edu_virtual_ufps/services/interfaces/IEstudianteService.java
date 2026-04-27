@@ -1,5 +1,6 @@
 package com.sistemas_mangager_be.edu_virtual_ufps.services.interfaces;
 
+import com.sistemas_mangager_be.edu_virtual_ufps.entities.Materia;
 import com.sistemas_mangager_be.edu_virtual_ufps.exceptions.*;
 import com.sistemas_mangager_be.edu_virtual_ufps.shared.DTOs.EstudianteDTO;
 import com.sistemas_mangager_be.edu_virtual_ufps.shared.requests.MoodleRequest;
@@ -23,6 +24,7 @@ public interface IEstudianteService {
 
     EstudianteResponse listarEstudiantePorEmail(String email) throws EstudianteNotFoundException;
     
+    
     List<EstudianteResponse> listarEstudiantes();
 
     List<EstudianteResponse> listarEstudiantesPorPensum(Integer pensumId) throws PensumNotFoundException;
@@ -33,7 +35,9 @@ public interface IEstudianteService {
 
     List<EstudianteResponse> listarEstudiantesPorEstado(Integer estadoEstudianteId) throws EstadoEstudianteNotFoundException;
 
-
+  
     List<EstudianteResponse> listarEstudiantesPorGrupoCohorteConMatriculaEnCurso(Long grupoCohorteId)
             throws CohorteNotFoundException;
-}
+
+    List<Materia> listarMateriasPorEstudiante(Integer estudianteId) throws EstudianteNotFoundException;
+        }

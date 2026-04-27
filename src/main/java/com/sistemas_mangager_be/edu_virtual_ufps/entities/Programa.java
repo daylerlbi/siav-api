@@ -38,4 +38,8 @@ public class Programa {
     @ManyToOne
     @JoinColumn(name = "tipo_programa_id")
     private TipoPrograma tipoPrograma;
+
+    @ManyToOne
+    @JoinColumn(name = "director_id")
+    private Usuario director;
 }

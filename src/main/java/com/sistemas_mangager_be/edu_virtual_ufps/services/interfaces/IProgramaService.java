@@ -19,6 +19,9 @@ public interface IProgramaService {
 
     List<ProgramaDTO> listarProgramas();
 
+    // ✅ NUEVO
+    List<ProgramaDTO> listarProgramasPorDirector(Integer directorId);
+
     void vincularHistoricoMoodleId(MoodleRequest moodleRequest)
             throws ProgramaNotFoundException, ProgramaExistsException;
 

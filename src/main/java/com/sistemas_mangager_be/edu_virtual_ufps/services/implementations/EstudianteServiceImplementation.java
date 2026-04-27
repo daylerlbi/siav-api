@@ -28,7 +28,6 @@ public class EstudianteServiceImplementation implements IEstudianteService {
     public static final String ARE_NOT_EQUALS = "%s no son iguales";
     public static final String IS_NOT_CORRECT = "%s no es correcta";
 
-
     private final GrupoCohorteRepository grupoCohorteRepository;
     private final MatriculaRepository matriculaRepository;
     private final PensumRepository pensumRepository;
@@ -37,6 +36,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
     private final EstadoEstudianteRepository estadoEstudianteRepository;
     private final EstudianteRepository estudianteRepository;
     private final RolRepository rolRepository;
+    private final MateriaRepository materiaRepository;
     private ProgramaRepository programaRepository;
 
     @Override
@@ -123,6 +123,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         return estudianteCreado;
     }
 
+    @Override
     public void vincularMoodleId(MoodleRequest moodleRequest)
             throws EstudianteNotFoundException, UserExistException {
         Estudiante estudiante = estudianteRepository.findById(moodleRequest.getBackendId())
@@ -147,6 +148,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         usuarioRepository.save(usuario);
     }
 
+    @Override
     public EstudianteDTO actualizarEstudiante(Integer id, EstudianteDTO estudianteDTO)
             throws UserNotFoundException, PensumNotFoundException, CohorteNotFoundException,
             EstadoEstudianteNotFoundException, EstudianteNotFoundException, EmailExistException, UserExistException {
@@ -214,6 +216,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         return estudianteActualizado;
     }
 
+    @Override
     public EstudianteResponse listarEstudiante(Integer id) throws EstudianteNotFoundException {
         Estudiante estudiante = estudianteRepository.findById(id)
                 .orElseThrow(() -> new EstudianteNotFoundException(
@@ -233,6 +236,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         return estudianteResponse;
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantes() {
         return estudianteRepository.findAll().stream().map(estudiante -> {
             EstudianteResponse estudianteResponse = new EstudianteResponse();
@@ -250,6 +254,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         }).collect(Collectors.toList());
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantesPorPensum(Integer pensumId) throws PensumNotFoundException {
         Pensum pensum = pensumRepository.findById(pensumId)
                 .orElseThrow(() -> new PensumNotFoundException(
@@ -271,6 +276,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         }).collect(Collectors.toList());
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantesPorGrupoCohorteConMatriculaEnCurso(Long grupoCohorteId)
             throws CohorteNotFoundException {
         GrupoCohorte grupoCohorte = grupoCohorteRepository.findById(grupoCohorteId)
@@ -298,6 +304,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         return estudiantesResponse;
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantesPorCohorte(Integer cohorteId) throws CohorteNotFoundException {
         CohorteGrupo cohorteGrupo = cohorteGrupoRepository.findById(cohorteId)
                 .orElseThrow(() -> new CohorteNotFoundException(
@@ -319,6 +326,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         }).collect(Collectors.toList());
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantesPorPrograma(Integer programaId)
             throws ProgramaNotFoundException {
         Programa programa = programaRepository.findById(programaId)
@@ -341,6 +349,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         }).collect(Collectors.toList());
     }
 
+    @Override
     public List<EstudianteResponse> listarEstudiantesPorEstado(Integer estadoEstudianteId)
             throws EstadoEstudianteNotFoundException {
         EstadoEstudiante estadoEstudiante = estadoEstudianteRepository.findById(estadoEstudianteId)
@@ -363,7 +372,6 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         }).collect(Collectors.toList());
     }
 
-    // ← NUEVO MÉTODO AGREGADO
     @Override
     public EstudianteResponse listarEstudiantePorEmail(String email) throws EstudianteNotFoundException {
         Estudiante estudiante = estudianteRepository.findByEmail(email)
@@ -382,5 +390,13 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         estudianteResponse.setEstadoEstudianteId(estudiante.getEstadoEstudianteId().getId());
         estudianteResponse.setEstadoEstudianteNombre(estudiante.getEstadoEstudianteId().getNombre());
         return estudianteResponse;
+    }
+
+    @Override
+    public List<Materia> listarMateriasPorEstudiante(Integer estudianteId) throws EstudianteNotFoundException {
+        estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new EstudianteNotFoundException(
+                        String.format(IS_NOT_FOUND, "EL ESTUDIANTE CON ID " + estudianteId).toLowerCase()));
+        return materiaRepository.findAllByPensumId_Estudiante(estudianteId);
     }
 }

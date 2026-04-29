@@ -7,6 +7,7 @@ import com.sistemas_mangager_be.edu_virtual_ufps.services.interfaces.IEstudiante
 import com.sistemas_mangager_be.edu_virtual_ufps.shared.DTOs.EstudianteDTO;
 import com.sistemas_mangager_be.edu_virtual_ufps.shared.requests.MoodleRequest;
 import com.sistemas_mangager_be.edu_virtual_ufps.shared.responses.EstudianteResponse;
+import com.sistemas_mangager_be.edu_virtual_ufps.shared.responses.NotaEstudianteResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -46,11 +47,11 @@ public class EstudianteServiceImplementation implements IEstudianteService {
 
         if (estudianteRepository.existsByCodigo(estudianteDTO.getCodigo())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El código de estudiante " + estudianteDTO.getCodigo()));
+                    String.format(IS_ALREADY_USE, "El cÃ³digo de estudiante " + estudianteDTO.getCodigo()));
         }
         if (estudianteRepository.existsByEmail(estudianteDTO.getEmail())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El correo electrónico " + estudianteDTO.getEmail()));
+                    String.format(IS_ALREADY_USE, "El correo electrÃ³nico " + estudianteDTO.getEmail()));
         }
         if (estudianteRepository.existsByCedula(estudianteDTO.getCedula())) {
             throw new UserExistException(
@@ -163,12 +164,12 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         if (!estudiante.getEmail().equals(estudianteDTO.getEmail()) &&
                 estudianteRepository.existsByEmail(estudianteDTO.getEmail())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El correo electrónico " + estudianteDTO.getEmail()));
+                    String.format(IS_ALREADY_USE, "El correo electrÃ³nico " + estudianteDTO.getEmail()));
         }
         if (!estudiante.getCodigo().equals(estudianteDTO.getCodigo()) &&
                 estudianteRepository.existsByCodigo(estudianteDTO.getCodigo())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El código de estudiante " + estudianteDTO.getCodigo()));
+                    String.format(IS_ALREADY_USE, "El cÃ³digo de estudiante " + estudianteDTO.getCodigo()));
         }
         if (estudianteDTO.getMoodleId() != null && !estudianteDTO.getMoodleId().isEmpty() &&
                 !estudianteDTO.getMoodleId().equals(estudiante.getMoodleId()) &&
@@ -399,4 +400,41 @@ public class EstudianteServiceImplementation implements IEstudianteService {
                         String.format(IS_NOT_FOUND, "EL ESTUDIANTE CON ID " + estudianteId).toLowerCase()));
         return materiaRepository.findAllByPensumId_Estudiante(estudianteId);
     }
+
+    @Override
+    public List<NotaEstudianteResponse> listarNotasPorEstudiante(Integer estudianteId) throws EstudianteNotFoundException {
+        Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                .orElseThrow(() -> new EstudianteNotFoundException(
+                        String.format(IS_NOT_FOUND, "EL ESTUDIANTE CON ID " + estudianteId).toLowerCase()));
+
+        List<Matricula> matriculas = matriculaRepository.findByEstudianteId(estudiante);
+        List<NotaEstudianteResponse> response = new ArrayList<>();
+
+        for (Matricula matricula : matriculas) {
+            NotaEstudianteResponse notaResponse = new NotaEstudianteResponse();
+            notaResponse.setMatriculaId(matricula.getId());
+            notaResponse.setSemestre(matricula.getSemestre());
+            notaResponse.setNota(matricula.getNota());
+
+            if (matricula.getEstadoMatriculaId() != null) {
+                notaResponse.setEstadoMatricula(matricula.getEstadoMatriculaId().getNombre());
+            }
+
+            if (matricula.getGrupoCohorteId() != null &&
+                matricula.getGrupoCohorteId().getGrupoId() != null &&
+                matricula.getGrupoCohorteId().getGrupoId().getMateriaId() != null) {
+
+                Materia materia = matricula.getGrupoCohorteId().getGrupoId().getMateriaId();
+                notaResponse.setMateriaNombre(materia.getNombre());
+                notaResponse.setMateriaCodigo(materia.getCodigo());
+                notaResponse.setMateriaCreditos(materia.getCreditos());
+                notaResponse.setMateriaSemestre(materia.getSemestre());
+            }
+
+            response.add(notaResponse);
+        }
+
+        return response;
+    }
 }
+

@@ -1,6 +1,7 @@
 package com.sistemas_mangager_be.edu_virtual_ufps.controllers;
 
 import com.sistemas_mangager_be.edu_virtual_ufps.entities.Materia;
+import com.sistemas_mangager_be.edu_virtual_ufps.shared.responses.NotaEstudianteResponse;
 import com.sistemas_mangager_be.edu_virtual_ufps.exceptions.*;
 import com.sistemas_mangager_be.edu_virtual_ufps.services.interfaces.IEstudianteService;
 import com.sistemas_mangager_be.edu_virtual_ufps.services.interfaces.IGrupoService;
@@ -28,17 +29,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/estudiantes")
 @RequiredArgsConstructor
-@Tag(name = "Gestión de Estudiantes", description = "API para la administración integral de estudiantes de SIAV UFPS. "
+@Tag(name = "GestiÃ³n de Estudiantes", description = "API para la administraciÃ³n integral de estudiantes de SIAV UFPS. "
         +
-        "Gestiona registro, actualización, consultas y vinculación con plataforma Moodle.")
+        "Gestiona registro, actualizaciÃ³n, consultas y vinculaciÃ³n con plataforma Moodle.")
 public class EstudianteController {
 
     private final IEstudianteService estudianteService;
     private final IGrupoService iGrupoService;
 
-    @Operation(summary = "Crear nuevo estudiante", description = "Registra un nuevo estudiante en el sistema validando unicidad de código, email, cédula y MoodleID. "
+    @Operation(summary = "Crear nuevo estudiante", description = "Registra un nuevo estudiante en el sistema validando unicidad de cÃ³digo, email, cÃ©dula y MoodleID. "
             +
-            "Crea automáticamente el usuario asociado y establece la relación con pensum, cohorte y estado.")
+            "Crea automÃ¡ticamente el usuario asociado y establece la relaciÃ³n con pensum, cohorte y estado.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Estudiante creado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EstudianteDTO.class), examples = @ExampleObject(value = """
                     {
@@ -46,9 +47,9 @@ public class EstudianteController {
                         "usuarioId": 15,
                         "codigo": "20241001",
                         "nombre": "Juan Carlos",
-                        "nombre2": "Andrés",
-                        "apellido": "Pérez",
-                        "apellido2": "García",
+                        "nombre2": "AndrÃ©s",
+                        "apellido": "PÃ©rez",
+                        "apellido2": "GarcÃ­a",
                         "email": "juan.perez@ufps.edu.co",
                         "telefono": "3001234567",
                         "cedula": "1098765432",
@@ -64,7 +65,7 @@ public class EstudianteController {
                         "httpStatusCode": 400,
                         "httpStatus": "BAD_REQUEST",
                         "reason": "Bad Request",
-                        "message": "El código de estudiante 20241001 ya existe en el sistema"
+                        "message": "El cÃ³digo de estudiante 20241001 ya existe en el sistema"
                     }
                     """))),
             @ApiResponse(responseCode = "404", description = "Pensum, cohorte o estado de estudiante no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
@@ -179,8 +180,11 @@ public class EstudianteController {
         List<Materia> materias = estudianteService.listarMateriasPorEstudiante(id);
         return new ResponseEntity<>(materias, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/notas")
+    public ResponseEntity<List<NotaEstudianteResponse>> listarNotasPorEstudiante(
+            @PathVariable Integer id) throws EstudianteNotFoundException {
+        List<NotaEstudianteResponse> notas = estudianteService.listarNotasPorEstudiante(id);
+        return new ResponseEntity<>(notas, HttpStatus.OK);
+    }
 }
-
-
-
-

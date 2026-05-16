@@ -47,11 +47,11 @@ public class EstudianteServiceImplementation implements IEstudianteService {
 
         if (estudianteRepository.existsByCodigo(estudianteDTO.getCodigo())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El cÃ³digo de estudiante " + estudianteDTO.getCodigo()));
+                    String.format(IS_ALREADY_USE, "El código de estudiante " + estudianteDTO.getCodigo()));
         }
         if (estudianteRepository.existsByEmail(estudianteDTO.getEmail())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El correo electrÃ³nico " + estudianteDTO.getEmail()));
+                    String.format(IS_ALREADY_USE, "El correo electrónico " + estudianteDTO.getEmail()));
         }
         if (estudianteRepository.existsByCedula(estudianteDTO.getCedula())) {
             throw new UserExistException(
@@ -164,12 +164,12 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         if (!estudiante.getEmail().equals(estudianteDTO.getEmail()) &&
                 estudianteRepository.existsByEmail(estudianteDTO.getEmail())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El correo electrÃ³nico " + estudianteDTO.getEmail()));
+                    String.format(IS_ALREADY_USE, "El correo electrónico " + estudianteDTO.getEmail()));
         }
         if (!estudiante.getCodigo().equals(estudianteDTO.getCodigo()) &&
                 estudianteRepository.existsByCodigo(estudianteDTO.getCodigo())) {
             throw new UserExistException(
-                    String.format(IS_ALREADY_USE, "El cÃ³digo de estudiante " + estudianteDTO.getCodigo()));
+                    String.format(IS_ALREADY_USE, "El código de estudiante " + estudianteDTO.getCodigo()));
         }
         if (estudianteDTO.getMoodleId() != null && !estudianteDTO.getMoodleId().isEmpty() &&
                 !estudianteDTO.getMoodleId().equals(estudiante.getMoodleId()) &&
@@ -413,6 +413,7 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         for (Matricula matricula : matriculas) {
             NotaEstudianteResponse notaResponse = new NotaEstudianteResponse();
             notaResponse.setMatriculaId(matricula.getId());
+            notaResponse.setGrupoCohorteId(matricula.getGrupoCohorteId() != null ? matricula.getGrupoCohorteId().getId() : null);
             notaResponse.setSemestre(matricula.getSemestre());
             notaResponse.setNota(matricula.getNota());
 
@@ -437,4 +438,3 @@ public class EstudianteServiceImplementation implements IEstudianteService {
         return response;
     }
 }
-

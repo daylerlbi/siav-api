@@ -30,5 +30,5 @@ public class MatriculaResponse {
     private Date fechaCorreoEnviado;
     private Date fechaNota;
     private String semestre;
-    private boolean notaAbierta;
+    private Boolean notaAbierta;
 }

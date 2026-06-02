@@ -1,5 +1,7 @@
 package com.sistemas_mangager_be.edu_virtual_ufps.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sistemas_mangager_be.edu_virtual_ufps.entities.TipoContraprestacion;
 import com.sistemas_mangager_be.edu_virtual_ufps.exceptions.ContraprestacionException;
 import com.sistemas_mangager_be.edu_virtual_ufps.exceptions.EstudianteNotFoundException;
@@ -90,30 +92,22 @@ public class ContraprestacionController {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class))
         )
     })
-    @PostMapping("/crear")
-    public ResponseEntity<HttpResponse> crearContraprestacion(
-        @Parameter(
-            description = "Información de la contraprestación incluyendo estudiante, tipo, actividades y fechas",
-            required = true,
-            schema = @Schema(implementation = ContraprestacionDTO.class),
-            example = """
-            {
-                "estudianteId": 1,
-                "tipoContraprestacionId": 1,
-                "actividades": "Apoyo en laboratorio de sistemas, tutorías a estudiantes de primer semestre",
-                "fechaInicio": "2024-02-01",
-                "fechaFin": "2024-06-30"
-            }
-            """
-        )
-        @RequestBody ContraprestacionDTO contraprestacionDTO) throws ContraprestacionException, EstudianteNotFoundException {
-        
-        contraprestacionService.crearContraprestacion(contraprestacionDTO);
-        return new ResponseEntity<>(
-                new HttpResponse(HttpStatus.OK.value(), HttpStatus.OK, HttpStatus.OK.getReasonPhrase(),
-                        "Contraprestacion creada con exito"),
-                HttpStatus.OK);
-    }
+   @PostMapping(value = "/crear", consumes = {"multipart/form-data"})
+public ResponseEntity<HttpResponse> crearContraprestacion(
+    @RequestPart(value = "datos") String datosJson,
+    @RequestPart(value = "archivo", required = false) MultipartFile archivo)
+    throws ContraprestacionException, EstudianteNotFoundException, IOException {
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new JavaTimeModule());
+    ContraprestacionDTO contraprestacionDTO = mapper.readValue(datosJson, ContraprestacionDTO.class);
+
+    contraprestacionService.crearContraprestacion(contraprestacionDTO, archivo);
+    return new ResponseEntity<>(
+            new HttpResponse(HttpStatus.OK.value(), HttpStatus.OK, HttpStatus.OK.getReasonPhrase(),
+                    "Contraprestacion creada con exito"),
+            HttpStatus.OK);
+}
 
     @Operation(
         summary = "Actualizar contraprestación",

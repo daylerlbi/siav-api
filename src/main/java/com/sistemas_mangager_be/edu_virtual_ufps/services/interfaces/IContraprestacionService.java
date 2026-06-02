@@ -12,8 +12,8 @@ import java.util.List;
 
 public interface IContraprestacionService {
 
-    void crearContraprestacion(ContraprestacionDTO contraprestacionDTO)
-            throws EstudianteNotFoundException, ContraprestacionException;
+     void crearContraprestacion(ContraprestacionDTO contraprestacionDTO, MultipartFile archivo)
+        throws EstudianteNotFoundException, ContraprestacionException, IOException;
 
     void actualizarContraprestacion(Integer id, ContraprestacionDTO contraprestacionDTO)
             throws EstudianteNotFoundException, ContraprestacionException;

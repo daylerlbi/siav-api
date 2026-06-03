@@ -81,6 +81,30 @@ public class MatriculaController {
                                 HttpStatus.OK);
         }
 
+        @Operation(summary = "Registrar matrículas en lote", description = "Crea múltiples matrículas para varios estudiantes en un mismo grupo-cohorte. "
+                        + "Procesa cada matrícula individualmente, registrando exitosas y fallidas.")
+        @PostMapping("/crear/lote")
+        public ResponseEntity<HttpResponse> crearMatriculaLote(
+                        @RequestBody List<MatriculaDTO> matriculas,
+                        @RequestHeader(value = "X-Usuario", defaultValue = "Sistema") String usuario) {
+
+                int exitosas = 0;
+                int fallidas = 0;
+                for (MatriculaDTO dto : matriculas) {
+                        try {
+                                matriculaService.crearMatricula(dto, usuario);
+                                exitosas++;
+                        } catch (Exception e) {
+                                fallidas++;
+                        }
+                }
+                String mensaje = "Matrículas procesadas: " + exitosas + " exitosas, " + fallidas + " fallidas";
+                return new ResponseEntity<>(
+                                new HttpResponse(HttpStatus.OK.value(), HttpStatus.OK,
+                                                HttpStatus.OK.getReasonPhrase(), mensaje),
+                                HttpStatus.OK);
+        }
+
         @Operation(summary = "Anular matrícula académica", description = "Cancela una matrícula activa cambiando su estado a 'Anulada'. "
                         +
                         "Valida que la matrícula esté en estado 'En curso', desmatricula automáticamente " +
@@ -143,8 +167,7 @@ public class MatriculaController {
                                                 "fechaCorreoEnviado": null
                                             }
                                         ]
-                                        """))),
-                        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
+                                        """)))
         })
         @GetMapping("/estudiante/{estudianteId}")
         public ResponseEntity<List<MatriculaResponse>> listarMatriculasEnCursoPorEstudiante(
@@ -192,21 +215,11 @@ public class MatriculaController {
                                                         "estadoId": 1,
                                                         "estadoNombre": "Aprobado",
                                                         "colorCard": "#17C96466"
-                                                    },
-                                                    {
-                                                        "codigo": "FTIC",
-                                                        "nombre": "Fundamentos de TIC",
-                                                        "creditos": 4,
-                                                        "semestreAprobado": null,
-                                                        "estadoId": 2,
-                                                        "estadoNombre": "En curso",
-                                                        "colorCard": "#F5A52466"
                                                     }
                                                 ]
                                             }
                                         ]
-                                        """))),
-                        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado o sin pensum asignado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
+                                        """)))
         })
         @GetMapping("/pensum/estudiante/{estudianteId}")
         public ResponseEntity<List<PensumResponse>> listarPensumPorEstudiante(
@@ -237,8 +250,7 @@ public class MatriculaController {
                                             "reason": "Bad Request",
                                             "message": "El estudiante no tiene matrículas en curso"
                                         }
-                                        """))),
-                        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
+                                        """)))
         })
         @PostMapping("/correo/estudiante/{estudianteId}")
         public ResponseEntity<HttpResponse> enviarCorreo(
@@ -254,13 +266,7 @@ public class MatriculaController {
                                 HttpStatus.OK);
         }
 
-        @Operation(summary = "Verificar estado de envío de correo de matrícula", description = "Consulta si el estudiante tiene al menos una matrícula en curso con correo de confirmación enviado. "
-                        +
-                        "Útil para validar notificaciones y evitar envíos duplicados.")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Estado de correo consultado exitosamente", content = @Content(mediaType = "application/json", schema = @Schema(type = "boolean"), examples = @ExampleObject(value = "true"))),
-                        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
-        })
+        @Operation(summary = "Verificar estado de envío de correo de matrícula")
         @GetMapping("/correo-enviado/{estudianteId}")
         public ResponseEntity<Boolean> verificarCorreoEnviado(
                         @Parameter(description = "ID del estudiante para verificar estado de correo", required = true, example = "1", schema = @Schema(type = "integer", minimum = "1")) @PathVariable Integer estudianteId)
@@ -270,21 +276,7 @@ public class MatriculaController {
                 return new ResponseEntity<>(correoEnviado, HttpStatus.OK);
         }
 
-        @Operation(summary = "Consultar grupos disponibles por materia", description = "Obtiene todos los grupos-cohorte-docente disponibles para una materia específica. "
-                        +
-                        "Incluye información completa de grupos, cohortes, docentes asignados y detalles " +
-                        "de la materia. Útil para el proceso de selección de grupo durante matrícula.")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Lista de grupos por materia obtenida exitosamente", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = GrupoCohorteDocenteResponse.class)))),
-                        @ApiResponse(responseCode = "404", description = "Materia no encontrada", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class), examples = @ExampleObject(value = """
-                                        {
-                                            "httpStatusCode": 404,
-                                            "httpStatus": "NOT_FOUND",
-                                            "reason": "Not Found",
-                                            "message": "la materia con el id MIN no fue encontrada"
-                                        }
-                                        """)))
-        })
+        @Operation(summary = "Consultar grupos disponibles por materia")
         @GetMapping("/grupos/materia/{materiaId}")
         public ResponseEntity<List<GrupoCohorteDocenteResponse>> listarGruposPorMateria(
                         @Parameter(description = "Código de la materia para consultar grupos disponibles", required = true, example = "MIN", schema = @Schema(type = "string")) @PathVariable String materiaId)
@@ -295,38 +287,7 @@ public class MatriculaController {
                 return new ResponseEntity<>(grupoCohorteDocenteResponses, HttpStatus.OK);
         }
 
-        @Operation(summary = "Consultar historial de cambios de estado de matrícula", description = "Obtiene el historial completo de cambios de estado de matrículas de un estudiante "
-                        +
-                        "para el semestre actual. Incluye trazabilidad de usuarios responsables, fechas " +
-                        "y detalles de materias/grupos. Información crucial para auditorías académicas.")
-        @ApiResponses(value = {
-                        @ApiResponse(responseCode = "200", description = "Historial de cambios de estado obtenido exitosamente", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CambioEstadoMatriculaResponse.class)), examples = @ExampleObject(value = """
-                                        [
-                                            {
-                                                "id": 1,
-                                                "estadoMatriculaId": 2,
-                                                "estadoMatriculaNombre": "En curso",
-                                                "materiaId": 1,
-                                                "materiaNombre": "Metodología de la Investigación",
-                                                "materiaCodigo": "MIN",
-                                                "grupoId": 1,
-                                                "grupoNombre": "Metodología de la Investigación - Grupo A",
-                                                "grupoCodigo": "MINA",
-                                                "fechaCambioEstadoMatricula": "2024-01-15T08:00:00",
-                                                "usuarioCambioEstadoMatricula": "admin.academico"
-                                            }
-                                        ]
-                                        """))),
-                        @ApiResponse(responseCode = "400", description = "No se encontraron cambios de estado para el estudiante", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class), examples = @ExampleObject(value = """
-                                        {
-                                            "httpStatusCode": 400,
-                                            "httpStatus": "BAD_REQUEST",
-                                            "reason": "Bad Request",
-                                            "message": "No se encontraron cambios de estado para el estudiante"
-                                        }
-                                        """))),
-                        @ApiResponse(responseCode = "404", description = "Estudiante no encontrado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = HttpResponse.class)))
-        })
+        @Operation(summary = "Consultar historial de cambios de estado de matrícula")
         @GetMapping("/cambio/estudiante/{estudianteId}")
         public ResponseEntity<List<CambioEstadoMatriculaResponse>> listarCambioEstadoMatriculaPorEstudiante(
                         @Parameter(description = "ID del estudiante para consultar historial de cambios de estado", required = true, example = "1", schema = @Schema(type = "integer", minimum = "1")) @PathVariable Integer estudianteId)

@@ -337,8 +337,17 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista completa de usuarios obtenida exitosamente", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UsuarioResponse.class))))
     })
     @GetMapping
-    public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
-        List<UsuarioResponse> usuarioResponse = iUsuarioService.listarUsuarios();
-        return new ResponseEntity<>(usuarioResponse, HttpStatus.OK);
-    }
+public ResponseEntity<List<UsuarioResponse>> listarUsuarios() {
+    List<UsuarioResponse> usuarioResponse = iUsuarioService.listarUsuarios();
+    return new ResponseEntity<>(usuarioResponse, HttpStatus.OK);
+}
+
+@Operation(summary = "Consultar usuario por email")
+@GetMapping("/email/{email}")
+public ResponseEntity<UsuarioResponse> listarUsuarioPorEmail(
+        @PathVariable String email)
+        throws UserNotFoundException {
+    UsuarioResponse usuarioResponse = iUsuarioService.listarUsuarioPorEmail(email);
+    return new ResponseEntity<>(usuarioResponse, HttpStatus.OK);
+}
 }

@@ -115,7 +115,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     usuario.setFotoUrl(loginGoogleRequest.getFotoUrl() == null ? usuario.getFotoUrl()
                             : loginGoogleRequest.getFotoUrl());
 
-                    // ✅ CORRECCIÓN: Solo asigna Estudiante si no tiene ningún rol asignado
                     if (usuario.getRolId() == null) {
                         Rol rolEstudiante = rolRepository.findById(1).orElseThrow();
                         usuario.setRolId(rolEstudiante);
@@ -151,7 +150,6 @@ public class UsuarioServiceImplementation implements IUsuarioService {
                     usuario.setNombreCompleto(nombre.isEmpty() ? usuario.getNombreCompleto() : nombre);
                     usuario.setFotoUrl(fotoUrl == null ? usuario.getFotoUrl() : fotoUrl);
 
-                    // ✅ CORRECCIÓN: Solo asigna Estudiante si no tiene ningún rol asignado
                     if (usuario.getRolId() == null) {
                         Rol rolEstudiante = rolRepository.findById(1).orElseThrow();
                         usuario.setRolId(rolEstudiante);
@@ -235,6 +233,18 @@ public class UsuarioServiceImplementation implements IUsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format(IS_NOT_FOUND, "EL USUARIO CON ID " + id).toLowerCase()));
+
+        UsuarioResponse usuarioResponse = new UsuarioResponse();
+        BeanUtils.copyProperties(usuario, usuarioResponse);
+        usuarioResponse.setRol(usuario.getRolId().getNombre());
+        return usuarioResponse;
+    }
+
+    @Override
+    public UsuarioResponse listarUsuarioPorEmail(String email) throws UserNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format(IS_NOT_FOUND, "EL USUARIO CON EMAIL " + email).toLowerCase()));
 
         UsuarioResponse usuarioResponse = new UsuarioResponse();
         BeanUtils.copyProperties(usuario, usuarioResponse);

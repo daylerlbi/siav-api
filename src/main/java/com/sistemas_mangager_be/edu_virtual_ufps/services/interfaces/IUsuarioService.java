@@ -28,6 +28,7 @@ public interface IUsuarioService {
 
     UsuarioDTO crearProfesor(DocenteRequest docenteRequest) throws RoleNotFoundException, UserExistException;
 
+    
     void vincularMoodleId(MoodleRequest moodleRequest) throws UserNotFoundException, UserExistException;
 
     UsuarioDTO actualizarProfesor(DocenteRequest docenteRequest, Integer id)
@@ -36,6 +37,6 @@ public interface IUsuarioService {
     List<UsuarioResponse> listarUsuariosPorRol(Integer rolId) throws RoleNotFoundException;
 
     UsuarioResponse listarUsuario(Integer id) throws UserNotFoundException;
-
+    UsuarioResponse listarUsuarioPorEmail(String email) throws UserNotFoundException;
     List<UsuarioResponse> listarUsuarios();
 } 

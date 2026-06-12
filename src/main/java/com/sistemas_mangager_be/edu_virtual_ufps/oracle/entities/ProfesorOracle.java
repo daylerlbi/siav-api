@@ -1,4 +1,4 @@
-package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
+﻿package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import com.sistemas_mangager_be.edu_virtual_ufps.utils.EncodingUtils;
+import jakarta.persistence.PostLoad;
 
 @Data
 @AllArgsConstructor
@@ -46,6 +48,13 @@ public class ProfesorOracle {
 
     @Column(name = "EMAILI")
     private String emaili;
-}
 
+    @PostLoad
+    public void fixEncoding() {
+        this.nombre1 = EncodingUtils.fixOracleString(this.nombre1);
+        this.nombre2 = EncodingUtils.fixOracleString(this.nombre2);
+        this.apellido1 = EncodingUtils.fixOracleString(this.apellido1);
+        this.apellido2 = EncodingUtils.fixOracleString(this.apellido2);
+    }
+}
 

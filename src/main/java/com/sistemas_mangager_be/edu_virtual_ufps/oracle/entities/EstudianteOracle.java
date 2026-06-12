@@ -1,4 +1,4 @@
-package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
+﻿package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import com.sistemas_mangager_be.edu_virtual_ufps.utils.EncodingUtils;
+import jakarta.persistence.PostLoad;
 
 @Data
 @AllArgsConstructor
@@ -57,5 +59,15 @@ public class EstudianteOracle {
     @Column(name = "EMAIL")
     private String email;
 
+    @PostLoad
+    public void fixEncoding() {
+        this.nomCarrera = EncodingUtils.fixOracleString(this.nomCarrera);
+        this.primerNombre = EncodingUtils.fixOracleString(this.primerNombre);
+        this.segundoNombre = EncodingUtils.fixOracleString(this.segundoNombre);
+        this.primerApellido = EncodingUtils.fixOracleString(this.primerApellido);
+        this.segundoApellido = EncodingUtils.fixOracleString(this.segundoApellido);
+        this.descTipoCar = EncodingUtils.fixOracleString(this.descTipoCar);
+    }
 }
+
 

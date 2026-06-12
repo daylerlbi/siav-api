@@ -1,4 +1,4 @@
-package com.sistemas_mangager_be.edu_virtual_ufps.config;
+﻿package com.sistemas_mangager_be.edu_virtual_ufps.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,12 @@ public class OracleDataSourceConfig {
                 .dataSource(oracleDataSource)
                 .packages("com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities")
                 .persistenceUnit("oracle")
-                .properties(Map.of("hibernate.dialect", "org.hibernate.dialect.OracleDialect"))
+                .properties(Map.of(
+                        "hibernate.dialect", "org.hibernate.dialect.OracleDialect",
+                        "hibernate.connection.useUnicode", "true",
+                        "hibernate.connection.characterEncoding", "UTF-8",
+                        "hibernate.connection.charSet", "UTF-8"
+                ))
                 .build();
     }
 
@@ -53,3 +58,4 @@ public class OracleDataSourceConfig {
         return new JpaTransactionManager(entityManagerFactory);
     }
 }
+

@@ -1,4 +1,4 @@
-package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
+﻿package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
 
 import com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities.Id.MateriaOracleId;
 import jakarta.persistence.*;
@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.sistemas_mangager_be.edu_virtual_ufps.utils.EncodingUtils;
+import jakarta.persistence.PostLoad;
 
 @Data
 @AllArgsConstructor
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @IdClass(MateriaOracleId.class)
-@Table(name = "MATERIA") // Asegúrate que este sea el nombre real de la tabla
+@Table(name = "MATERIA") // AsegÃºrate que este sea el nombre real de la tabla
 public class MateriaOracle {
 
     @Id
@@ -72,6 +74,13 @@ public class MateriaOracle {
 
     @Column(name = "ID_MICRO")
     private Integer idMicro;
+
+    @PostLoad
+    public void fixEncoding() {
+        this.nombre = EncodingUtils.fixOracleString(this.nombre);
+    }
 }
+
+
 
 

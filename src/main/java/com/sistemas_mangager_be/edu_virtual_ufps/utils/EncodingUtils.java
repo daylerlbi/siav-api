@@ -1,4 +1,4 @@
-﻿package com.sistemas_mangager_be.edu_virtual_ufps.utils;
+package com.sistemas_mangager_be.edu_virtual_ufps.utils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

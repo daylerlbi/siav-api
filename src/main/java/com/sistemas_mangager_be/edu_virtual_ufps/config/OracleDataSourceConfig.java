@@ -1,4 +1,4 @@
-﻿package com.sistemas_mangager_be.edu_virtual_ufps.config;
+package com.sistemas_mangager_be.edu_virtual_ufps.config;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-﻿package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
+package com.sistemas_mangager_be.edu_virtual_ufps.oracle.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
